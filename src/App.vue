@@ -47,12 +47,14 @@ export default {
     return {
       drawer: false,
       enum_defs: [],
-      selected_enum_def_index: 0,
+      selected_enum_def_index: -1,
     }
   },
   computed: {
     currentDescriptions: {
       get() {
+        if (this.selected_enum_def_index === -1) return []
+        if (this.enum_defs.length <= this.selected_enum_def_index) return []
         return this.enum_defs[this.selected_enum_def_index].descriptions
       }
     }
@@ -67,6 +69,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        if (index === this.selected_enum_def_index) {
+          this.selected_enum_def_index = -1
+        }
+        if (index < this.selected_enum_def_index) {
+          this.selected_enum_def_index -= 1
+        }
         this.enum_defs.splice(index, 1)
         window.utools.dbStorage.setItem("enum_defs", this.enum_defs)
       })
@@ -105,6 +113,7 @@ export default {
 html,
 body {
   height: 100%;
+  width: 100%;
   margin: 0;
   overflow-x: hidden;
 }
@@ -113,6 +122,7 @@ body {
   margin: 0;
   position: absolute;
   min-height: 100%;
+  min-width: 100%;
   display: flex;
   flex-direction: column;
 }

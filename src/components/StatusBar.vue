@@ -15,7 +15,7 @@
         </div>
         <div class="enum-chooser">
             <el-select v-model="selectedValIndex" size="mini">
-                <el-option v-for="(enum_def, i) in enum_defs" :key="i" :label="enum_def.name" :value="i" />
+                <el-option v-for="(enum_def, i) in enum_defs" :key="i" :label="enum_def.name" :value="i.toString()" />
             </el-select>
         </div>
     </div>
@@ -34,10 +34,11 @@ export default {
     computed: {
         selectedValIndex: {
             get() {
-                return this.value
+                if (this.value === -1) return ''
+                else return this.value.toString()
             },
             set(val) {
-                this.$emit('input', val);
+                this.$emit('input', parseInt(val));
             }
         }
     }
@@ -63,7 +64,8 @@ export default {
 }
 
 .enum-chooser {
-    margin-right:8px;
+    margin-right: 8px;
+
     select {
         font-size: 1em;
     }

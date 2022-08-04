@@ -6,11 +6,6 @@
 		  "code": "bitarray_visualize",
 		  "explain": "bitarray visualizer",
 			"cmds":["bv", "查看比特位"]
-		},
-		{
-		  "code": "setting",
-		  "explain": "set bitarray description",
-			"cmds":["设置比特位转义"]
 		}
 	],
 	"development": {
