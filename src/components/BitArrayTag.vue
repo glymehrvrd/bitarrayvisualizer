@@ -28,7 +28,6 @@ export default {
                 result.push({ name: desc, exist: (mask & this.value) == mask })
                 mask <<= 1
             }
-            console.log(result)
             return result
         }
     }

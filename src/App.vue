@@ -1,7 +1,35 @@
 <template>
   <div id="app">
     <Display :descriptions="currentDescriptions"></Display>
-    <StatusBar :enum_defs="enum_defs" v-model="selected_enum_def" />
+    <StatusBar :enum_defs="enum_defs" v-model="selected_enum_def_index" @onSetting="drawer = true" />
+    <el-drawer direction="ltr" :visible.sync="drawer" title="枚举定义列表">
+      <div class="setting-drawer">
+        <div class="setting-enumdef-list">
+          <div class="setting-enumdef-list-item" v-for="(enum_def, index) in enum_defs" :key="enum_def.name">
+            <span>{{ enum_def.name }} </span>
+            <svg width="1em" height="1em" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+              @click="handleDeleteEnumDef(index)">
+              <path d="M6 12V6H7V12H6Z" fill="currentColor" fill-opacity="0.9"></path>
+              <path d="M9 6V12H10V6H9Z" fill="currentColor" fill-opacity="0.9"></path>
+              <path
+                d="M10.5 3H14V4H13V14C13 14.5523 12.5523 15 12 15H4C3.44772 15 3 14.5523 3 14V4H2V3H5.5L5.5 1.8C5.5 1.35817 5.85817 1 6.3 1H9.7C10.1418 1 10.5 1.35817 10.5 1.8V3ZM6.5 3H9.5L9.5 2L6.5 2V3ZM4 4V14H12V4H4Z"
+                fill="currentColor" fill-opacity="0.9"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="setting-enumdef-adder">
+          <svg width="2em" height="2em" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+            @click="handleAddEnumDef">
+            <path d="M7.5 8.5H4.5V7.5H7.5V4.5H8.5V7.5H11.5V8.5H8.5V11.5H7.5V8.5Z" fill="currentColor"
+              fill-opacity="0.9">
+            </path>
+            <path
+              d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15ZM8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 11.3137 11.3137 14 8 14Z"
+              fill="currentColor" fill-opacity="0.9"></path>
+          </svg>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -17,37 +45,105 @@ export default {
   },
   data() {
     return {
-      enum_defs: [
-        {
-          name: 'extend_flag',
-          descriptions: ['职业', '证件有效期', '地区，省级（手Q侧有使用）', '国家省市', '地址（手Q侧有使用）', '电话', '手机号', '邮件', '性别', '国籍', '证件类型', '证件号', '证件生效期', '姓名', '常住地址', '影印件地址']
-        },
-        {
-          name: 'authen_channel_state',
-          descriptions: ['身份文本信息公安部认证', '身份证影印件公安部认证', '支持实名认证的银行卡绑卡', '不支持实名认证的招行类银行绑卡', '通过移动运营商认证', '通过联通运营商认证', '通过电信运营商认证', '通过学历认证', '通过银联认证', '通过人脸识别', '通过微信验卡', 'QQ社交认证', '中铁认证', '微信社交认证', '银联二要素认证', '移民局认证', '微信人脸认证']
-        }
-      ],
-      selected_enum_def: 'extend_flag',
+      drawer: false,
+      enum_defs: [],
+      selected_enum_def_index: 0,
     }
   },
   computed: {
     currentDescriptions: {
       get() {
-        for (let i = 0; i < this.enum_defs.length; i++) {
-          const ele = this.enum_defs[i]
-          if (ele.name === this.selected_enum_def) {
-            return ele.descriptions
-          }
+        return this.enum_defs[this.selected_enum_def_index].descriptions
+      }
+    }
+  },
+  mounted() {
+    this.enum_defs = window.utools.dbStorage.getItem("enum_defs")
+  },
+  methods: {
+    handleDeleteEnumDef(index) {
+      this.$confirm("确定删除 " + this.enum_defs[index].name + " ？", "确认", {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.enum_defs.splice(index, 1)
+        window.utools.dbStorage.setItem("enum_defs", this.enum_defs)
+      })
+    },
+    async handleAddEnumDef() {
+      let name = ''
+      let value = ''
+      try {
+        name = await this.$prompt('输入枚举名', '添加', {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+        })
+        try {
+          value = await this.$prompt('输入枚举值，英文逗号分隔', '添加', {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            inputPlaceholder: '示例：比特位1,比特位2,比特位3'
+          })
+          this.enum_defs.push({
+            name: name.value,
+            descriptions: value.value.split(','),
+          })
+          window.utools.dbStorage.setItem("enum_defs", this.enum_defs)
+        } catch {
+          console.log()
         }
-        return []
+      } catch {
+        console.log()
       }
     }
   }
 }
 </script>
 
-<style>
-.body {
+<style lang="scss">
+html,
+body {
+  height: 100%;
+  margin: 0;
   overflow-x: hidden;
+}
+
+#app {
+  margin: 0;
+  position: absolute;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-drawer {
+  margin-right: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-enumdef-list-item {
+  margin: 10px;
+
+  span {
+    user-select: none;
+  }
+
+  svg {
+    float: right;
+    cursor: pointer;
+  }
+}
+
+.setting-enumdef-adder {
+  margin-top: auto;
+
+  svg {
+    margin: 1em;
+    float: right;
+    cursor: pointer;
+  }
 }
 </style>

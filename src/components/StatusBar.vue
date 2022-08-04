@@ -1,6 +1,6 @@
 <template>
     <div class="status-bar">
-        <div class="setting-button">
+        <div class="setting-button" @click="$emit('onSetting')">
             <svg width="1em" height="1em" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M11.0002 8C11.0002 9.65685 9.65702 11 8.00017 11C6.34331 11 5.00017 9.65685 5.00017 8C5.00017 6.34315 6.34331 5 8.00017 5C9.65702 5 11.0002 6.34315 11.0002 8ZM10.0002 8C10.0002 6.89543 9.10474 6 8.00017 6C6.8956 6 6.00017 6.89543 6.00017 8C6.00017 9.10457 6.8956 10 8.00017 10C9.10474 10 10.0002 9.10457 10.0002 8Z"
@@ -14,11 +14,9 @@
             </span>
         </div>
         <div class="enum-chooser">
-            <select v-model="selectedVal">
-                <option v-for="enum_def in enum_defs" :key="enum_def.name" :value="enum_def.name">
-                    {{ enum_def.name }}
-                </option>
-            </select>
+            <el-select v-model="selectedValIndex" size="mini">
+                <el-option v-for="(enum_def, i) in enum_defs" :key="i" :label="enum_def.name" :value="i" />
+            </el-select>
         </div>
     </div>
 </template>
@@ -30,11 +28,11 @@ export default {
             type: Array
         },
         value: {
-            type: String
+            type: Number
         },
     },
     computed: {
-        selectedVal: {
+        selectedValIndex: {
             get() {
                 return this.value
             },
@@ -48,6 +46,8 @@ export default {
 
 <style lang="scss" scoped>
 .status-bar {
+    margin-top: auto;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
 }
@@ -56,13 +56,16 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 8px;
+    margin-right: 8px;
     cursor: pointer;
     color: #808080;
 }
 
-.enum-chooser select {
-    font-size: 1em;
+.enum-chooser {
+    margin-right:8px;
+    select {
+        font-size: 1em;
+    }
 }
 </style>
