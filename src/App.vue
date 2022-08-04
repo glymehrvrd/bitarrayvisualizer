@@ -60,7 +60,7 @@ export default {
     }
   },
   mounted() {
-    this.enum_defs = window.utools.dbStorage.getItem("enum_defs")
+    this.enum_defs = window.utools.dbStorage.getItem("enum_defs") || []
   },
   methods: {
     handleDeleteEnumDef(index) {
