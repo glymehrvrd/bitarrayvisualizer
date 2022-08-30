@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Dialog, { Title, Content, Actions } from "@smui/dialog";
+  import Button, { Label } from "@smui/button";
+
   import { current_component } from "svelte/internal";
   import { onMount } from "svelte/types/runtime/internal/lifecycle";
 
@@ -124,7 +127,7 @@
   </el-drawer>
 </main>
 
-<style lang="postcss">
+<style lang="scss">
   html,
   body {
     height: 100%;

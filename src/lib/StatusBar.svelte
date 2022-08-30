@@ -1,6 +1,6 @@
 <script lang="ts">
   export let enum_defs: Array<String>;
-  export let value: Number;
+  export let value: number;
 
   //   export default {
   //     name: "StatusBar",
@@ -60,7 +60,7 @@
   </div>
 </div>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .status-bar {
     margin-top: auto;
     margin-bottom: 8px;
