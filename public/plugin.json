@@ -1,0 +1,14 @@
+{
+	"main": "index.html",
+	"logo": "logo.png",
+	"features": [
+		{
+		  "code": "bitarray_visualize",
+		  "explain": "bitarray visualizer",
+			"cmds":["bv", "查看比特位"]
+		}
+	],
+	"development": {
+		"main": "http://127.0.0.1:8080/index.html"
+	}
+}
