@@ -12,6 +12,8 @@
   "devDependencies": {
     "@smui/button": "^6.1.0",
     "@smui/dialog": "^6.1.0",
+    "@smui/drawer": "^6.1.0",
+    "@smui/list": "^6.1.0",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "sass": "^1.54.6",

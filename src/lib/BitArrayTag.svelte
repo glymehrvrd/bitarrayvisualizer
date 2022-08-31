@@ -1,30 +1,16 @@
 <script lang="ts">
 import Tag from './Tag'
-export default {
-    name: 'BitArrayTag',
-    props: {
-        value: {
-            type: Number
-        },
-        descriptions: {
-            type: Array
-        }
-    },
-    components: {
-        Tag
-    },
-    computed: {
-        tags() {
-            const result = []
+export let value: number;
+export let descriptions: string[];
+
+$: {
+            const tags = []
             let mask = 1
             for (let i = 0; i < this.descriptions.length; i++) {
                 const desc = this.descriptions[i]
-                result.push({ name: desc, exist: (mask & this.value) == mask })
+                tags.push({ name: desc, exist: (mask & this.value) == mask })
                 mask <<= 1
             }
-            return result
-        }
-    }
 }
 </script>
 

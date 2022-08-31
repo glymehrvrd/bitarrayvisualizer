@@ -1,29 +1,9 @@
 <script lang="ts">
-  export let enum_defs: Array<String>;
+  import type { EnumberationDefinition } from "../types";
+  export let enum_defs: EnumberationDefinition;
   export let value: number;
 
-  //   export default {
-  //     name: "StatusBar",
-  //     props: {
-  //       enum_defs: {
-  //         type: Array,
-  //       },
-  //       value: {
-  //         type: Number,
-  //       },
-  //     },
-  //     computed: {
-  //       selectedValIndex: {
-  //         get() {
-  //           if (this.value === -1) return "";
-  //           else return this.value.toString();
-  //         },
-  //         set(val) {
-  //           this.$emit("input", parseInt(val));
-  //         },
-  //       },
-  //     },
-  //   };
+  $: selected_val_index = value === -1 ? "" : value.toString();
 </script>
 
 <div class="status-bar">
