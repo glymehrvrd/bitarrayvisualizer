@@ -1,3 +1,68 @@
+<script setup lang="ts">
+import { computed } from '@vue/reactivity';
+import { onMounted } from 'vue';
+import Display from './components/Display.vue'
+import StatusBar from './components/StatusBar.vue'
+
+let drawer = false;
+let enum_defs = [];
+let selected_enum_def_index = -1;
+
+const currentDescriptions = computed(() => {
+  if (selected_enum_def_index === -1) return []
+  if (enum_defs.length <= selected_enum_def_index) return []
+  return enum_defs[selected_enum_def_index].descriptions
+})
+
+onMounted(() => {
+  enum_defs = window.utools.dbStorage.getItem("enum_defs") || []
+})
+
+const handleDeleteEnumDef = function (index: number) {
+  $confirm("确定删除 " + enum_defs[index].name + " ？", "确认", {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    if (index === selected_enum_def_index) {
+      selected_enum_def_index = -1
+    }
+    if (index < selected_enum_def_index) {
+      selected_enum_def_index -= 1
+    }
+    enum_defs.splice(index, 1)
+    window.utools.dbStorage.setItem("enum_defs", enum_defs)
+  })
+}
+
+const handleAddEnumDef = async function () {
+  let name = ''
+  let value = ''
+  try {
+    name = await $prompt('输入枚举名', '添加', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+    })
+    try {
+      value = await $prompt('输入枚举值，英文逗号分隔', '添加', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        inputPlaceholder: '示例：比特位1,比特位2,比特位3'
+      })
+      enum_defs.push({
+        name: name.value,
+        descriptions: value.value.split(','),
+      })
+      window.utools.dbStorage.setItem("enum_defs", enum_defs)
+    } catch {
+      console.log()
+    }
+  } catch {
+    console.log()
+  }
+}
+</script>
+
 <template>
   <div id="app">
     <Display :descriptions="currentDescriptions"></Display>
@@ -33,83 +98,7 @@
   </div>
 </template>
 
-<script>
-import Display from './components/Display'
-import StatusBar from './components/StatusBar'
-
-export default {
-  name: 'App',
-  components: {
-    Display,
-    StatusBar,
-  },
-  data() {
-    return {
-      drawer: false,
-      enum_defs: [],
-      selected_enum_def_index: -1,
-    }
-  },
-  computed: {
-    currentDescriptions: {
-      get() {
-        if (this.selected_enum_def_index === -1) return []
-        if (this.enum_defs.length <= this.selected_enum_def_index) return []
-        return this.enum_defs[this.selected_enum_def_index].descriptions
-      }
-    }
-  },
-  mounted() {
-    this.enum_defs = window.utools.dbStorage.getItem("enum_defs") || []
-  },
-  methods: {
-    handleDeleteEnumDef(index) {
-      this.$confirm("确定删除 " + this.enum_defs[index].name + " ？", "确认", {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        if (index === this.selected_enum_def_index) {
-          this.selected_enum_def_index = -1
-        }
-        if (index < this.selected_enum_def_index) {
-          this.selected_enum_def_index -= 1
-        }
-        this.enum_defs.splice(index, 1)
-        window.utools.dbStorage.setItem("enum_defs", this.enum_defs)
-      })
-    },
-    async handleAddEnumDef() {
-      let name = ''
-      let value = ''
-      try {
-        name = await this.$prompt('输入枚举名', '添加', {
-          confirmButtonText: '确认',
-          cancelButtonText: '取消',
-        })
-        try {
-          value = await this.$prompt('输入枚举值，英文逗号分隔', '添加', {
-            confirmButtonText: '确认',
-            cancelButtonText: '取消',
-            inputPlaceholder: '示例：比特位1,比特位2,比特位3'
-          })
-          this.enum_defs.push({
-            name: name.value,
-            descriptions: value.value.split(','),
-          })
-          window.utools.dbStorage.setItem("enum_defs", this.enum_defs)
-        } catch {
-          console.log()
-        }
-      } catch {
-        console.log()
-      }
-    }
-  }
-}
-</script>
-
-<style lang="scss">
+<style lang="scss" scoped>
 html,
 body {
   height: 100%;
