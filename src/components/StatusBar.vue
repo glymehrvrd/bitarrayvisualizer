@@ -3,7 +3,7 @@ import { computed } from '@vue/reactivity';
 import { EnumberationDefinition } from '../types/types';
 
 const props = defineProps({
-    enum_defs: {
+    enumDefs: {
         type: Array<EnumberationDefinition>,
         default: [],
     },
@@ -43,7 +43,7 @@ const selectedValIndex = computed({
         </div>
         <div class="enum-chooser">
             <el-select v-model="selectedValIndex" size="small">
-                <el-option v-for="(enum_def, i) in enum_defs" :key="i" :label="enum_def.name" :value="i.toString()" />
+                <el-option v-for="(enumDef, i) in enumDefs" :key="i" :label="enumDef.name" :value="i.toString()" />
             </el-select>
         </div>
     </div>

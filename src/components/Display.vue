@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import BitArrayTag from './BitArrayTag.vue'
 
-let value = ref(0);
+const value = ref(0);
 
 const props = defineProps({
   descriptions: {
