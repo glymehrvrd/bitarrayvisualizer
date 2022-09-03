@@ -11,6 +11,7 @@ const drawerVisible = ref(false);
 const enumDefs: Ref<EnumberationDefinition[]> = ref([]);
 const selectedEnumDefIndex = ref(-1);
 
+const editingIndex = ref(-1);
 const enumDefEditorFormRef = ref<FormInstance>();
 const enumDefEditorVisible = ref(false);
 const enumDefEditorForm = reactive({
@@ -52,22 +53,35 @@ const handleDeleteEnumDef = function (index: number) {
   })
 }
 
+const handleAddEnumDef = function () {
+  editingIndex.value = -1;
+  enumDefEditorVisible.value = true;
+  enumDefEditorForm.name = '';
+  enumDefEditorForm.description = '';
+}
+
 const handleEditEnumDef = function (index: number) {
+  editingIndex.value = index;
   const item = enumDefs.value[index];
   enumDefEditorForm.name = item.name;
   enumDefEditorForm.description = item.descriptions.join(',');
   enumDefEditorVisible.value = true;
 }
 
-const handleAddEnumDef = async function (formEl: FormInstance | undefined) {
+const handleSetEnumDef = async function (formEl: FormInstance | undefined) {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (!valid) return;
     enumDefEditorVisible.value = false;
-    enumDefs.value.push({
-      name: enumDefEditorForm.name,
-      descriptions: enumDefEditorForm.description.split(','),
-    });
+    if (editingIndex.value == -1) {
+      enumDefs.value.push({
+        name: enumDefEditorForm.name,
+        descriptions: enumDefEditorForm.description.split(','),
+      });
+    } else {
+      enumDefs.value[editingIndex.value].name = enumDefEditorForm.name;
+      enumDefs.value[editingIndex.value].descriptions = enumDefEditorForm.description.split(',');
+    }
     storage.setItem("enumDefs", enumDefs.value);
   })
 }
@@ -105,7 +119,7 @@ const handleAddEnumDef = async function (formEl: FormInstance | undefined) {
       </div>
       <div class="setting-enumdef-adder">
         <svg width="2em" height="2em" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
-          @click="enumDefEditorVisible = true">
+          @click="handleAddEnumDef">
           <path d="M7.5 8.5H4.5V7.5H7.5V4.5H8.5V7.5H11.5V8.5H8.5V11.5H7.5V8.5Z" fill="currentColor" fill-opacity="0.9">
           </path>
           <path
@@ -127,7 +141,7 @@ const handleAddEnumDef = async function (formEl: FormInstance | undefined) {
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="enumDefEditorVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleAddEnumDef(enumDefEditorFormRef)">确认</el-button>
+        <el-button type="primary" @click="handleSetEnumDef(enumDefEditorFormRef)">确认</el-button>
       </span>
     </template>
   </el-dialog>
