@@ -1,38 +1,35 @@
+<script setup lang="ts">
+import { computed } from '@vue/reactivity';
+import Tag from './Tag.vue'
+
+const props = defineProps({
+    value: {
+        type: Number,
+        default: 0,
+    },
+    descriptions: {
+        type: Array<String>,
+        default: [],
+    }
+});
+
+const tags = computed(() => {
+    const result = [];
+    let mask = 1;
+    for (let i = 0; i < props.descriptions.length; i++) {
+        const desc = props.descriptions[i];
+        result.push({ name: desc, exist: (mask & props.value) == mask });
+        mask <<= 1;
+    }
+    return result;
+})
+</script>
+
 <template>
     <div class="bitarraytag">
-        <Tag v-for="tag in tags" :key="tag.name" :disabled="!tag.exist">{{ tag.name }}</Tag>
+        <Tag v-for="tag in tags" :key="(tag.name as string)" :disabled="!tag.exist">{{ tag.name }}</Tag>
     </div>
 </template>
-
-<script>
-import Tag from './Tag'
-export default {
-    name: 'BitArrayTag',
-    props: {
-        value: {
-            type: Number
-        },
-        descriptions: {
-            type: Array
-        }
-    },
-    components: {
-        Tag
-    },
-    computed: {
-        tags() {
-            const result = []
-            let mask = 1
-            for (let i = 0; i < this.descriptions.length; i++) {
-                const desc = this.descriptions[i]
-                result.push({ name: desc, exist: (mask & this.value) == mask })
-                mask <<= 1
-            }
-            return result
-        }
-    }
-}
-</script>
 
 <style lang="scss" scoped>
 </style>

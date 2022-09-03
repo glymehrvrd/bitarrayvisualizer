@@ -1,64 +1,68 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { onMounted } from 'vue';
-import Display from './components/Display.vue'
-import StatusBar from './components/StatusBar.vue'
+import Display from './components/Display.vue';
+import StatusBar from './components/StatusBar.vue';
+import type { EnumberationDefinition } from './types/types';
+import { ref } from 'vue';
+import { ElMessageBox } from 'element-plus'
 
-let drawer = false;
-let enum_defs = [];
+const drawer = ref(false);
+let enum_defs: EnumberationDefinition[] = [];
 let selected_enum_def_index = -1;
 
 const currentDescriptions = computed(() => {
-  if (selected_enum_def_index === -1) return []
-  if (enum_defs.length <= selected_enum_def_index) return []
-  return enum_defs[selected_enum_def_index].descriptions
+  if (selected_enum_def_index === -1) return [];
+  if (enum_defs.length <= selected_enum_def_index) return [];
+  return enum_defs[selected_enum_def_index].descriptions;
 })
 
 onMounted(() => {
-  enum_defs = window.utools.dbStorage.getItem("enum_defs") || []
+  // @ts-ignore
+  enum_defs = window.utools?.dbStorage.getItem("enum_defs") || [];
 })
 
 const handleDeleteEnumDef = function (index: number) {
-  $confirm("确定删除 " + enum_defs[index].name + " ？", "确认", {
+  ElMessageBox.confirm("确定删除 " + enum_defs[index].name + " ？", "确认", {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
     if (index === selected_enum_def_index) {
-      selected_enum_def_index = -1
+      selected_enum_def_index = -1;
     }
     if (index < selected_enum_def_index) {
-      selected_enum_def_index -= 1
+      selected_enum_def_index -= 1;
     }
-    enum_defs.splice(index, 1)
-    window.utools.dbStorage.setItem("enum_defs", enum_defs)
+    enum_defs.splice(index, 1);
+    // @ts-ignore
+    window.utools?.dbStorage.setItem("enum_defs", enum_defs);
   })
 }
 
 const handleAddEnumDef = async function () {
-  let name = ''
-  let value = ''
   try {
-    name = await $prompt('输入枚举名', '添加', {
+    let name = await ElMessageBox.prompt('输入枚举名', '添加', {
       confirmButtonText: '确认',
       cancelButtonText: '取消',
-    })
+    });
     try {
-      value = await $prompt('输入枚举值，英文逗号分隔', '添加', {
+      let value = await ElMessageBox.prompt('输入枚举值，英文逗号分隔', '添加', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         inputPlaceholder: '示例：比特位1,比特位2,比特位3'
-      })
+      });
       enum_defs.push({
         name: name.value,
         descriptions: value.value.split(','),
-      })
-      window.utools.dbStorage.setItem("enum_defs", enum_defs)
-    } catch {
-      console.log()
+      });
+      // @ts-ignore
+      window.utools?.dbStorage.setItem("enum_defs", enum_defs);
+    } catch (err) {
+      console.log(err);
     }
-  } catch {
-    console.log()
+  } catch (err) {
+    console.log(err);
   }
 }
 </script>
@@ -66,8 +70,8 @@ const handleAddEnumDef = async function () {
 <template>
   <div id="app">
     <Display :descriptions="currentDescriptions"></Display>
-    <StatusBar :enum_defs="enum_defs" v-model="selected_enum_def_index" @onSetting="drawer = true" />
-    <el-drawer direction="ltr" :visible.sync="drawer" title="枚举定义列表">
+    <StatusBar :enum_defs="enum_defs" v-model="selected_enum_def_index" @setting="drawer = true" />
+    <el-drawer direction="ltr" v-model="drawer" title="枚举定义列表">
       <div class="setting-drawer">
         <div class="setting-enumdef-list">
           <div class="setting-enumdef-list-item" v-for="(enum_def, index) in enum_defs" :key="enum_def.name">

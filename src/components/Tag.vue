@@ -1,20 +1,17 @@
+<script setup lang="ts">
+defineProps({
+    disabled: {
+        type: Boolean,
+        default: false
+    }
+});
+</script>
+
 <template>
     <span class="tag" :class="{ 'tag-disabled': disabled }">
         <slot />
     </span>
 </template>
-
-<script>
-export default {
-    name: 'Tag',
-    props: {
-        disabled: {
-            type: Boolean,
-            default: false
-        }
-    }
-}
-</script>
 
 <style lang="scss" scoped>
 .tag {
@@ -35,6 +32,7 @@ export default {
     border: 1px solid transparent;
     white-space: nowrap
 }
+
 .tag-disabled {
     line-height: 22px;
     color: black;
