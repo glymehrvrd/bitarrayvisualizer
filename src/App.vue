@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, Ref, reactive } from '@vue/reactivity';
+import { ref, computed, Ref, reactive, toRaw } from '@vue/reactivity';
 import Display from './components/Display.vue';
 import StatusBar from './components/StatusBar.vue';
 import type { EnumberationDefinition } from './types/types';
@@ -33,7 +33,7 @@ const currentDescriptions = computed(() => {
 })
 
 onMounted(() => {
-  enumDefs.value = storage.getItem("enumDefs") || [];
+  enumDefs.value = storage.getItem("enum_defs") || [];
 })
 
 const handleDeleteEnumDef = function (index: number) {
@@ -49,7 +49,7 @@ const handleDeleteEnumDef = function (index: number) {
       selectedEnumDefIndex.value -= 1;
     }
     enumDefs.value.splice(index, 1);
-    storage.setItem("enumDefs", enumDefs.value);
+    storage.setItem("enum_defs", toRaw(enumDefs.value));
   })
 }
 
@@ -82,7 +82,8 @@ const handleSetEnumDef = async function (formEl: FormInstance | undefined) {
       enumDefs.value[editingIndex.value].name = enumDefEditorForm.name;
       enumDefs.value[editingIndex.value].descriptions = enumDefEditorForm.description.split(',');
     }
-    storage.setItem("enumDefs", enumDefs.value);
+    debugger
+    storage.setItem("enum_defs", toRaw(enumDefs.value));
   })
 }
 </script>
@@ -129,13 +130,13 @@ const handleSetEnumDef = async function (formEl: FormInstance | undefined) {
       </div>
     </div>
   </el-drawer>
-  <el-dialog v-model="enumDefEditorVisible" title="Shipping address">
+  <el-dialog v-model="enumDefEditorVisible" title="枚举值编辑">
     <el-form :model="enumDefEditorForm" :rules="rules" ref="enumDefEditorFormRef">
       <el-form-item label="枚举名" prop="name">
         <el-input v-model="enumDefEditorForm.name" />
       </el-form-item>
-      <el-form-item label="枚举值，英文逗号分隔" prop="description">
-        <el-input v-model="enumDefEditorForm.description" placeholder="示例：比特位1,比特位2,比特位3" />
+      <el-form-item label="枚举值，英文逗号分隔" prop="description" style="display: block">
+        <el-input type="textarea" v-model="enumDefEditorForm.description" placeholder="示例：比特位1,比特位2,比特位3" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -166,14 +167,14 @@ body {
 }
 
 .setting-drawer {
-  margin-right: 20px;
+  margin-right: 5px;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .setting-enumdef-list-item {
-  margin: 10px;
+  margin: 5px;
 
   span {
     user-select: none;
@@ -189,7 +190,6 @@ body {
   margin-top: auto;
 
   svg {
-    margin: 1em;
     float: right;
     cursor: pointer;
   }
