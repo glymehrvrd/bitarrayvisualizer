@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, Ref, ref } from '@vue/reactivity';
-import { rowContextKey } from 'element-plus';
+import { computed, Ref, ref, toRaw } from '@vue/reactivity';
+import { ElMessageBox, rowContextKey } from 'element-plus';
+import { storage } from '../utils/storage';
 
 const props = defineProps({
     modelValue: {
@@ -23,7 +24,7 @@ const tableData = computed(() => {
         result.push({
             nth: i.toString(),
             description: desc.toString(),
-            value: (1 << i).toString(16),
+            value: '0x' + (1 << i).toString(16),
         })
     }
     return result;
@@ -50,6 +51,16 @@ const changeDescription = (scope: any) => {
     editingRow.value = false;
     scope.row.editing = false;
 }
+
+const handleDeleteRow = function (index: number) {
+    ElMessageBox.confirm("确定删除？", "确认", {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        props.modelValue.splice(index, 1);
+    }).catch(() => { })
+}
 </script>
 
 <template>
@@ -67,6 +78,13 @@ const changeDescription = (scope: any) => {
             </template>
         </el-table-column>
         <el-table-column prop="value" label="枚举值" />
+        <el-table-column label="操作">
+            <template #default="scope">
+                <el-icon style="cursor: pointer">
+                    <Delete @click="handleDeleteRow(scope.$index)" />
+                </el-icon>
+            </template>
+        </el-table-column>
     </el-table>
     <el-button link @click="modelValue.push('')">添加</el-button>
     <el-button link @click="enumDefBatchAdderVisible = true">批量添加</el-button>
